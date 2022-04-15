@@ -1,0 +1,15 @@
+{
+  "name": "lamden-js-builders",
+  "version": "1.0.0",
+  "description": "Batch Transactions via the Masternode Rest API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lamden-js": "^3.6.0",
+    "node-fetch": "^3.2.3"
+  }
+}
