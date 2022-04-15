@@ -113,9 +113,9 @@ export class TransactionBatcher {
 
     await Promise.all(
       Object.keys(this.txBatches).map((senderVk) => {
+        // to do
         //const senderBatch = this.txBatches[senderVk].splice(0, 15);
         const senderBatch = this.txBatches[senderVk];
-
         //if (senderBatch.length <= 15) delete this.txBatches[senderVk];
 
         return new Promise(async (resolver) => {
