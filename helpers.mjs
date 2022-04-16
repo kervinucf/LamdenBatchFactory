@@ -95,9 +95,8 @@ export const createTestTransaction = (
     let transactions = [];
     while (transactions.length < num) {
       transactions.push(createTestTransaction(sender));
-      console.log(num, transactions.length);
     }
-    console.log(transactions);
+
     return transactions;
   }
   return {

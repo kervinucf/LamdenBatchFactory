@@ -1,57 +1,41 @@
 import fetch from "node-fetch";
 import Lamden from "lamden-js";
-
-const HTTP_POST_REQUEST = async (url, params) => {
-  return new Promise((resolve) => {
-    setTimeout(async () => {
-      const response = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify(params),
-      });
-
-      resolve(response);
-    }, 1000);
-  });
-};
-
-const HTTP_GET_REQUEST = async (url) => {
-  return new Promise((resolve) => {
-    setTimeout(async () => {
-      const response = await fetch(url);
-      console.log(`get request sent -- > ${url}`);
-      resolve(response);
-    }, 1000);
-  });
-};
+import { HTTP_GET_REQUEST, HTTP_POST_REQUEST } from "./helpers.mjs";
 
 export class TransactionBuilder {
   constructor(networkInfo, batched = false) {
     this.wallet = Lamden.wallet;
     this.networkInfo = networkInfo;
     this.batched = batched;
-    this.transaction = null;
+    this.transactionInfo = null;
   }
   addTransactionInfo = async (transactionInfo) => {
-    this.transaction = await this.createPayload(transactionInfo);
+    this.transactionInfo = await this.createPayload(transactionInfo);
   };
   createPayload = async (transactionInfo) => {
-    const transactionData = this.extractTransactionInfo(transactionInfo);
+    return {
+      payload: this.extractTransactionInfo(transactionInfo),
+    };
+  };
+
+  addProcessorInfo = async (vk, transaction) => {
     let processorData = {};
     let nonce = null;
     let processor = null;
     if (!this.batched) {
-      processorData = await this.getProcessorInfo(transactionData.sender);
+      processorData = await this.getProcessorInfo(vk);
     } else {
-      if (this.transaction) {
-        nonce = this.transaction.nonce;
-        processor = this.transaction.processor;
+      if (this.transactionInfo) {
+        nonce = this.transactionInfo.payload.nonce;
+        processor = this.transactionInfo.payload.processor;
       }
       processorData = {
         nonce: nonce,
         processor: processor,
       };
     }
-    const payloadData = Object.assign({}, transactionData, processorData);
+
+    const payloadData = Object.assign({}, transaction, processorData);
     return {
       payload: payloadData,
     };
@@ -77,20 +61,20 @@ export class TransactionBuilder {
       stamps_supplied: transactionInfo.stamps,
     };
   };
+  // ####################################################################################################
   processTransaction = async (sk) => {
     return new Promise((resolve) => {
       setTimeout(async () => {
-        const transaction = await this.signTransaction(sk, this.transaction);
-
-        const result = await this.sendTransaction(transaction);
+        const result = await this.sendTransaction(sk);
         resolve(result);
       }, 1000);
     });
   };
+  // ####################################################################################################
   signTransaction = async (sk, payload) => {
     let signature = null;
     const message = await payload;
-    console.log(payload);
+
     if (sk) {
       const stringBuffer = Buffer.from(JSON.stringify(message.payload));
       let messageBytes = new Uint8Array(stringBuffer);
@@ -109,18 +93,30 @@ export class TransactionBuilder {
     const tx_payload = message;
     return Object.assign({}, tx_metadata, tx_payload);
   };
-  sendTransaction = async (transactionData) => {
+  sendTransaction = async (sk) => {
+    const preSignedTransaction = await this.addProcessorInfo(
+      this.transactionInfo.payload.sender,
+      this.transactionInfo.payload
+    );
+    const signedTransaction = await this.signTransaction(
+      sk,
+      preSignedTransaction
+    );
     return await HTTP_POST_REQUEST(
       this.networkInfo.hosts[0],
-      transactionData
+      signedTransaction
     ).then(async (res) => {
       return await res.json();
     });
   };
 
   addBatchNonce = async (nonceResult) => {
-    this.transaction["payload"]["nonce"] = nonceResult.nonce;
-    this.transaction["payload"]["processor"] = nonceResult.processor;
+    this.transactionInfo["payload"] = {
+      ...this.transactionInfo["payload"],
+      nonce: nonceResult.nonce,
+      processor: nonceResult.processor,
+    };
+
     if (nonceResult.hosts[0]) {
       this.networkInfo["hosts"] = nonceResult.hosts;
     } else {

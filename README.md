@@ -14,7 +14,7 @@ npm install node-fetch
 ```javascript
 const SendSingleTx = async (txInfo, sk) => {
   const new_transaction = initializeTransactionBuilder();
-  await new_transaction.addTransactionInfo(txInfo);
+  new_transaction.addTransactionInfo(txInfo);
   return await sendTransaction(new_transaction, sk);
 };
 

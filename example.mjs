@@ -21,7 +21,7 @@ console.log(test_wallet);
 
 const SendSingleTx = async (txInfo, sk) => {
   const new_transaction = initializeTransactionBuilder();
-  await new_transaction.addTransactionInfo(txInfo);
+  new_transaction.addTransactionInfo(txInfo);
   return await sendTransaction(new_transaction, sk);
 };
 
@@ -43,6 +43,5 @@ const SendBatchTx = async (batch, sk) => {
   await sendBatch(new_batch, sk);
 };
 
-const transactions = createTestTransaction(test_wallet.vk, 3);
-console.log(transactions);
+const transactions = createTestTransaction(test_wallet.vk, 2);
 await SendBatchTx(transactions, test_wallet.sk);

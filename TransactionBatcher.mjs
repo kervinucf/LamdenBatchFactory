@@ -1,15 +1,6 @@
 import { TransactionBuilder } from "./TransactionBuilder.mjs";
 import fetch from "node-fetch";
-
-const HTTP_GET_REQUEST = async (url) => {
-  return new Promise((resolve) => {
-    setTimeout(async () => {
-      const response = await fetch(url);
-      console.log(`get request sent -- > ${url}`);
-      resolve(response);
-    }, 1000);
-  });
-};
+import { HTTP_GET_REQUEST } from "./helpers.mjs";
 
 export class TransactionBatcher {
   constructor(networkInfo) {
@@ -69,8 +60,8 @@ export class TransactionBatcher {
       .sort(async (a, b) => {
         let _a = await a;
         let _b = await b;
-        a = _a.transaction.payload.nonce;
-        b = _b.transaction.payload.nonce;
+        a = _a.transactionInfo.payload.nonce;
+        b = _b.transactionInfo.payload.nonce;
         a - b;
       });
   }
@@ -133,7 +124,7 @@ export class TransactionBatcher {
 
           this.sendBatch(txBatch, sk).then((sentList) => {
             sentTransactions = [...sentTransactions, ...sentList];
-            console.log(sentTransactions);
+
             resolver();
           });
         });
