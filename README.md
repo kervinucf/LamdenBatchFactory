@@ -5,8 +5,7 @@ Batch Transactions via the Masternode Rest API
 ## Packages
 
 ```bash
-npm install lamden-js
-npm install node-fetch
+npm i
 ```
 
 ## Single Transaction
