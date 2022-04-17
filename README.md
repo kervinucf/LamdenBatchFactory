@@ -51,5 +51,14 @@ const SendBatchTx = async (batch, sk) => {
     }
 */
 const transactions = ArrayOfTransctions;
-await SendBatchTx(transactions, wallet.sk);
+const transaction_hashs = await SendBatchTx(transactions, wallet.sk);
+
+if (transaction_hashes) {
+  for (let transaction_hash in transaction_hashes) {
+    const processed_block = await getBlock(
+      transaction_hashes[transaction_hash]
+    );
+    console.log(processed_block);
+  }
+}
 ```

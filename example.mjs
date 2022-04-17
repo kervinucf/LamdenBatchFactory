@@ -3,7 +3,7 @@ import {
   SendBatchTx,
   createTestTransaction,
   getBlock,
-} from "./lib/helpers.mjs";
+} from "./lib/utils.mjs";
 
 // throwaway
 const test_wallet = {
