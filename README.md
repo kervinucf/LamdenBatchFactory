@@ -24,6 +24,7 @@ const transaction = {
   kwargs: someKwargsObject,
   stamps: stampsLimit,
 };
+
 const transaction_hash = await SendSingleTx(transaction, wallet.sk);
 
 if (transaction_hash) {
@@ -50,6 +51,7 @@ const SendBatchTx = async (batch, sk) => {
         stamps: stampsLimit,
     }
 */
+
 const transactions = ArrayOfTransctions;
 const transaction_hashs = await SendBatchTx(transactions, wallet.sk);
 
